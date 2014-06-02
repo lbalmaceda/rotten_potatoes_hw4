@@ -252,3 +252,15 @@ end
 Then /^show me the page$/ do
   save_and_open_page
 end
+
+
+Given(/^the following movies exist:$/) do |table|
+  table.hashes.each do |movie|
+    Movie.create!(movie)
+  end
+end
+
+Then(/^the director of "(.*?)" should be "(.*?)"$/) do |arg1, arg2|
+  Movie.find_by_title(arg1).director == arg2
+end
+
