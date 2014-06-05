@@ -18,8 +18,8 @@ ActiveRecord::Schema.define(:version => 20140602162636) do
     t.string   "rating"
     t.text     "description"
     t.datetime "release_date"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
     t.string   "director"
   end
 

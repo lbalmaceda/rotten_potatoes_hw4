@@ -7,13 +7,17 @@ class MoviesController < ApplicationController
   end
 
   def index
+    flag = false
     sort = params[:sort] || session[:sort]
     case sort
     when 'title'
-      ordering,@title_header = {:order => :title}, 'hilite'
+      ordering = {:order => :title}
+      @title_header = 'hilite'
     when 'release_date'
-      ordering,@date_header = {:order => :release_date}, 'hilite'
+      ordering = {:order => :release_date}
+      @date_header = 'hilite'
     end
+
     @all_ratings = Movie.all_ratings
     @selected_ratings = params[:ratings] || session[:ratings] || {}
     
@@ -24,15 +28,17 @@ class MoviesController < ApplicationController
     if params[:sort] != session[:sort]
       session[:sort] = sort
       flash.keep
-      redirect_to :sort => sort, :ratings => @selected_ratings and return
+      flag = true
     end
 
     if params[:ratings] != session[:ratings] and @selected_ratings != {}
       session[:sort] = sort
       session[:ratings] = @selected_ratings
       flash.keep
-      redirect_to :sort => sort, :ratings => @selected_ratings and return
+      flag = true
     end
+    redirect_to :sort => sort, :ratings => @selected_ratings unless not flag
+    
     @movies = Movie.find_all_by_rating(@selected_ratings.keys, ordering)
   end
 
@@ -66,11 +72,10 @@ class MoviesController < ApplicationController
 
   def similar
     m = Movie.find(params[:id])
-    p m.director
     if (m.director.nil? || m.director.empty?)
       flash[:notice] = "'#{m.title}' has no director info"
       redirect_to :root
     end
-    @movies = Movie.where(:director => m.director)
+    @movies = Movie.similar_movies_by_director(m.director)
   end
 end
